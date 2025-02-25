@@ -115,31 +115,28 @@ function moveToWaypoint(index) {
                 if (!portal) {
                     portal = createPortal();
                 }
-                // Move to specific position for portal view
-                const portalViewPosition = {
-                    position: { x: -99.91, y: -157.00, z: 3.85 },
-                    rotation: { x: 29.48, y: -87.47, z: 29.46 }
+                // First move to staff table position
+                const staffTablePosition = {
+                    position: { x: -99.97, y: -157.00, z: 0.96 },
+                    rotation: { x: 66.18, y: -88.64, z: 66.17 }
                 };
 
-                setTimeout(() => {
-                    // Animate to exact portal viewing position
-                    new TWEEN.Tween(camera.position)
-                        .to(portalViewPosition.position, 2000)
-                        .easing(TWEEN.Easing.Cubic.InOut)
-                        .start();
+                new TWEEN.Tween(camera.position)
+                    .to(staffTablePosition.position, 2000)
+                    .easing(TWEEN.Easing.Cubic.InOut)
+                    .start();
 
-                    new TWEEN.Tween(camera.rotation)
-                        .to({
-                            x: THREE.MathUtils.degToRad(portalViewPosition.rotation.x),
-                            y: THREE.MathUtils.degToRad(portalViewPosition.rotation.y),
-                            z: THREE.MathUtils.degToRad(portalViewPosition.rotation.z)
-                        }, 2000)
-                        .easing(TWEEN.Easing.Cubic.InOut)
-                        .start()
-                        .onComplete(() => {
-                            startPortalSequence();
-                        });
-                }, 1500);
+                new TWEEN.Tween(camera.rotation)
+                    .to({
+                        x: THREE.MathUtils.degToRad(staffTablePosition.rotation.x),
+                        y: THREE.MathUtils.degToRad(staffTablePosition.rotation.y),
+                        z: THREE.MathUtils.degToRad(staffTablePosition.rotation.z)
+                    }, 2000)
+                    .easing(TWEEN.Easing.Cubic.InOut)
+                    .start()
+                    .onComplete(() => {
+                        startPortalSequence();
+                    });
             }
         });
 }
@@ -395,12 +392,10 @@ function createPortal() {
         if (intersects.length > 0) {
             // Mouse is over portal
             portalMaterial.uniforms.hoverState.value = 1.0;
-            overlay.style.opacity = '1';
             document.body.style.cursor = 'pointer';
         } else {
             // Mouse is not over portal
             portalMaterial.uniforms.hoverState.value = 0.0;
-            overlay.style.opacity = '0';
             document.body.style.cursor = 'default';
         }
     });
@@ -640,31 +635,45 @@ function updateModelMaterials(model) {
     })
 }
 
-// Update chamber loading function to maintain consistent look
+// Update chamber loading function with specific chamber coordinates
 function loadChamberOfSecrets() {
     const fadeOutDuration = 2000;
+    const chamberPosition = {
+        position: { x: -417.94, y: -229.70, z: 67.48 },
+        rotation: { x: 73.63, y: -60.20, z: 71.30 }
+    };
+
     new TWEEN.Tween(scene.fog)
         .to({ far: 10 }, fadeOutDuration)
         .easing(TWEEN.Easing.Quadratic.In)
         .start()
         .onComplete(() => {
-            // Remove ALL existing objects except lights
+            // Remove ALL existing objects except lights and camera
             const objectsToRemove = scene.children.filter(child =>
                 !(child instanceof THREE.Light) &&
                 !(child instanceof THREE.Camera)
             );
             objectsToRemove.forEach(obj => scene.remove(obj));
 
-            // Reset camera position and rotation
-            camera.position.set(0, 100, 500);
-            camera.rotation.set(0, 0, 0);
-            controls.target.set(0, 0, 0);
+            // Set camera to chamber-specific position
+            new TWEEN.Tween(camera.position)
+                .to(chamberPosition.position, 2000)
+                .easing(TWEEN.Easing.Cubic.InOut)
+                .start();
 
-            // Load Chamber of Secrets as a completely new scene
+            new TWEEN.Tween(camera.rotation)
+                .to({
+                    x: THREE.MathUtils.degToRad(chamberPosition.rotation.x),
+                    y: THREE.MathUtils.degToRad(chamberPosition.rotation.y),
+                    z: THREE.MathUtils.degToRad(chamberPosition.rotation.z)
+                }, 2000)
+                .easing(TWEEN.Easing.Cubic.InOut)
+                .start();
+
+            // Load Chamber of Secrets model
             sceneManager.loadModel('/models/chamber_of_secrets/scene.gltf', (model) => {
-                // Ensure chamber is oriented correctly
-                model.rotation.set(0, Math.PI, 0); // Rotate 180 degrees if needed
-                model.position.set(0, -100, 0); // Adjust Y position to ground level
+                model.rotation.set(0, Math.PI, 0);
+                model.position.set(0, -100, 0);
 
                 // Fade back in
                 new TWEEN.Tween(scene.fog)
@@ -673,6 +682,10 @@ function loadChamberOfSecrets() {
                     .delay(500)
                     .start();
             });
+
+            // Remove portal overlay
+            const overlay = document.getElementById('portalOverlay');
+            overlay.style.display = 'none';
         });
 }
 
@@ -706,3 +719,24 @@ sceneManager.loadModel('/models/hogwarts_grand_hall/scene.gltf', (model, scale) 
         currentWaypoint = 1;
     }, 2000);
 });
+
+// Update initial camera position and rotation
+camera.position.set(
+    locations.camera.initial.position.x,
+    locations.camera.initial.position.y,
+    locations.camera.initial.position.z
+);
+
+camera.rotation.set(
+    THREE.MathUtils.degToRad(locations.camera.initial.rotation.x),
+    THREE.MathUtils.degToRad(locations.camera.initial.rotation.y),
+    THREE.MathUtils.degToRad(locations.camera.initial.rotation.z)
+);
+
+// Update controls target
+controls.target.set(
+    locations.camera.target.x,
+    locations.camera.target.y,
+    locations.camera.target.z
+);
+controls.update();

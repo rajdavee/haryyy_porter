@@ -4,7 +4,15 @@ export const locations = {
             position: { x: 588.62, y: -154.82, z: -15.96 },
             rotation: { x: -108.78, y: 85.19, z: 108.85 }
         },
-        target: { x: 0, y: -154.82, z: 0 }
+        target: { x: 0, y: -154.82, z: 0 },
+        staffTable: {
+            position: { x: -99.97, y: -157.00, z: 0.96 },
+            rotation: { x: 66.18, y: -88.64, z: 66.17 }
+        },
+        chamberOfSecrets: {
+            position: { x: -417.94, y: -229.70, z: 67.48 },
+            rotation: { x: 73.63, y: -60.20, z: 71.30 }
+        }
     },
 
     waypoints: [
