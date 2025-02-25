@@ -517,6 +517,13 @@ const animate = () => {
         portal.userData.animate(clock.getElapsedTime());
     }
 
+    // Update any model animations
+    scene.traverse((object) => {
+        if (object.userData.mixer) {
+            object.userData.mixer.update(clock.getDelta());
+        }
+    });
+
     // Render
     renderer.render(scene, camera)
 
@@ -638,9 +645,13 @@ function updateModelMaterials(model) {
 // Update chamber loading function with specific chamber coordinates
 function loadChamberOfSecrets() {
     const fadeOutDuration = 2000;
-    const chamberPosition = {
+    const initialChamberPosition = {
         position: { x: -417.94, y: -229.70, z: 67.48 },
         rotation: { x: 73.63, y: -60.20, z: 71.30 }
+    };
+    const finalChamberPosition = {
+        position: { x: -145.76, y: -189.59, z: -40.97 },
+        rotation: { x: 139.68, y: -69.76, z: 141.47 }
     };
 
     new TWEEN.Tween(scene.fog)
@@ -655,20 +666,65 @@ function loadChamberOfSecrets() {
             );
             objectsToRemove.forEach(obj => scene.remove(obj));
 
-            // Set camera to chamber-specific position
+            // First move to initial chamber position
             new TWEEN.Tween(camera.position)
-                .to(chamberPosition.position, 2000)
+                .to(initialChamberPosition.position, 2000)
                 .easing(TWEEN.Easing.Cubic.InOut)
                 .start();
 
             new TWEEN.Tween(camera.rotation)
                 .to({
-                    x: THREE.MathUtils.degToRad(chamberPosition.rotation.x),
-                    y: THREE.MathUtils.degToRad(chamberPosition.rotation.y),
-                    z: THREE.MathUtils.degToRad(chamberPosition.rotation.z)
+                    x: THREE.MathUtils.degToRad(initialChamberPosition.rotation.x),
+                    y: THREE.MathUtils.degToRad(initialChamberPosition.rotation.y),
+                    z: THREE.MathUtils.degToRad(initialChamberPosition.rotation.z)
                 }, 2000)
                 .easing(TWEEN.Easing.Cubic.InOut)
-                .start();
+                .start()
+                .onComplete(() => {
+                    // Then move to final chamber position after a delay
+                    setTimeout(() => {
+                        new TWEEN.Tween(camera.position)
+                            .to(finalChamberPosition.position, 2000)
+                            .easing(TWEEN.Easing.Cubic.InOut)
+                            .start();
+
+                        new TWEEN.Tween(camera.rotation)
+                            .to({
+                                x: THREE.MathUtils.degToRad(finalChamberPosition.rotation.x),
+                                y: THREE.MathUtils.degToRad(finalChamberPosition.rotation.y),
+                                z: THREE.MathUtils.degToRad(finalChamberPosition.rotation.z)
+                            }, 2000)
+                            .easing(TWEEN.Easing.Cubic.InOut)
+                            .start()
+                            .onComplete(() => {
+                                // Load Firecrab model with correct position and rotation
+                                loader.load('/models/firecrab/scene.gltf', (gltf) => {
+                                    const firecrab = gltf.scene;
+                                    firecrab.scale.setScalar(25); // Keep larger scale
+
+                                    // Adjusted Y position to move lower
+                                    firecrab.position.set(95.26, -230.14, 30.06); // Changed Y from -150.14 to -180.14
+                                    firecrab.rotation.set(
+                                        THREE.MathUtils.degToRad(-8.84),
+                                        THREE.MathUtils.degToRad(72.29),
+                                        THREE.MathUtils.degToRad(8.43)
+                                    );
+
+                                    scene.add(firecrab);
+
+                                    // Add animation if the model has it
+                                    if (gltf.animations && gltf.animations.length) {
+                                        const mixer = new THREE.AnimationMixer(firecrab);
+                                        const action = mixer.clipAction(gltf.animations[0]);
+                                        action.play();
+
+                                        // Add mixer to animation loop
+                                        firecrab.userData.mixer = mixer;
+                                    }
+                                });
+                            });
+                    }, 1000); // Wait 1 second before moving to final position
+                });
 
             // Load Chamber of Secrets model
             sceneManager.loadModel('/models/chamber_of_secrets/scene.gltf', (model) => {

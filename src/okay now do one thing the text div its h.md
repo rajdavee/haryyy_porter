@@ -12,3 +12,7 @@ z=67.48
 x=73.63
 y=-60.20
 z=71.30
+
+
+
+okay and also see our existing div which we are using for enter that chamber  enter the chamber of secret is written there i want that type of 5-7 div at final postion half left side half right side   first willl be Dumbledore's Office name if user presses their take them to that route we will do things there next second one will be  Gryffindor Common Room  after Ollivander's Wand Shop after Potions Classroom after Umbridge's Office and last Transfiguration Class 
