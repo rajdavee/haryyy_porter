@@ -1,0 +1,174 @@
+body {
+    margin: 0;
+    background: #000;
+    color: #9b6dff;
+    font-family: 'Luminari', fantasy;
+    overflow: hidden;
+}
+
+.magical-content {
+    text-align: center;
+    padding: 2rem;
+    animation: fadeIn 1s ease-in;
+}
+
+.return-button {
+    display: inline-block;
+    padding: 15px 30px;
+    margin-top: 20px;
+    color: #9b6dff;
+    text-decoration: none;
+    border: 2px solid #9b6dff;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-shadow: 0 0 10px #9b6dff;
+    position: relative;
+    overflow: hidden;
+}
+
+.return-button::before {
+    content: '⚡';
+    position: absolute;
+    left: -20px;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.return-button:hover::before {
+    left: 10px;
+    opacity: 1;
+}
+
+.magical-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #9b6dff, #000);
+    animation: magicalFade 1s forwards;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes magicalFade {
+    from {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Theme-specific styles */
+.dumbledore-theme {
+    background: linear-gradient(#000510, #002);
+}
+
+.gryffindor-theme {
+    background: linear-gradient(#720b0b, #000);
+}
+
+.ollivander-theme {
+    background: linear-gradient(#2b1810, #000);
+}
+
+.potions-theme {
+    background: linear-gradient(#0a2a0a, #000);
+}
+
+.umbridge-theme {
+    background: linear-gradient(#ff9ecd, #ffc0cb);
+    color: #d4006a;
+}
+
+.transfiguration-theme {
+    background: linear-gradient(#4b0082, #000);
+}
+
+.hogwarts-locations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    pointer-events: all;
+}
+
+.location-btn {
+    opacity: 0;
+    transform: scale(0.9);
+    animation: buttonAppear 0.5s forwards;
+    margin: 10px;
+    min-width: 200px;
+}
+
+@keyframes buttonAppear {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.location-btn:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.location-btn:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.location-btn:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.location-btn:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.location-btn:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.location-btn:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+.location-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #9b6dff;
+    z-index: 2;
+}
