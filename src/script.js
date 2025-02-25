@@ -697,31 +697,11 @@ function loadChamberOfSecrets() {
                             .easing(TWEEN.Easing.Cubic.InOut)
                             .start()
                             .onComplete(() => {
-                                // Load Firecrab model with correct position and rotation
-                                loader.load('/models/firecrab/scene.gltf', (gltf) => {
-                                    const firecrab = gltf.scene;
-                                    firecrab.scale.setScalar(25); // Keep larger scale
+                                // Create and show location buttons
+                                createLocationButtons();
 
-                                    // Adjusted Y position to move lower
-                                    firecrab.position.set(95.26, -230.14, 30.06); // Changed Y from -150.14 to -180.14
-                                    firecrab.rotation.set(
-                                        THREE.MathUtils.degToRad(-8.84),
-                                        THREE.MathUtils.degToRad(72.29),
-                                        THREE.MathUtils.degToRad(8.43)
-                                    );
-
-                                    scene.add(firecrab);
-
-                                    // Add animation if the model has it
-                                    if (gltf.animations && gltf.animations.length) {
-                                        const mixer = new THREE.AnimationMixer(firecrab);
-                                        const action = mixer.clipAction(gltf.animations[0]);
-                                        action.play();
-
-                                        // Add mixer to animation loop
-                                        firecrab.userData.mixer = mixer;
-                                    }
-                                });
+                                // Load Firecrab
+                                loadFirecrab();
                             });
                     }, 1000); // Wait 1 second before moving to final position
                 });
@@ -744,6 +724,148 @@ function loadChamberOfSecrets() {
             overlay.style.display = 'none';
         });
 }
+
+// Add new function to create location buttons
+function createLocationButtons() {
+    // Remove any existing location buttons
+    const existingLocations = document.querySelector('.hogwarts-locations');
+    if (existingLocations) {
+        existingLocations.remove();
+    }
+
+    const locationsDiv = document.createElement('div');
+    locationsDiv.className = 'hogwarts-locations';
+
+    const locations = [
+        "Dumbledore's Office",
+        "Gryffindor Common Room",
+        "Ollivander's Wand Shop",
+        "Potions Classroom",
+        "Umbridge's Office",
+        "Transfiguration Class"
+    ];
+
+    // Create grid container for centered buttons
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'location-grid';
+
+    locations.forEach(location => {
+        const button = document.createElement('button');
+        button.className = 'enter-chamber-btn location-btn';
+        button.textContent = location;
+        button.onclick = () => navigateToLocation(location);
+        gridContainer.appendChild(button);
+    });
+
+    locationsDiv.appendChild(gridContainer);
+    document.body.appendChild(locationsDiv);
+}
+
+// Add new function to load Firecrab
+function loadFirecrab() {
+    loader.load('/models/firecrab/scene.gltf', (gltf) => {
+        const firecrab = gltf.scene;
+        firecrab.scale.setScalar(25);
+        firecrab.position.set(0, -300, 0); // Centered position
+        firecrab.rotation.set(
+            THREE.MathUtils.degToRad(-8.84),
+            THREE.MathUtils.degToRad(72.29),
+            THREE.MathUtils.degToRad(8.43)
+        );
+        scene.add(firecrab);
+
+        if (gltf.animations && gltf.animations.length) {
+            const mixer = new THREE.AnimationMixer(firecrab);
+            const action = mixer.clipAction(gltf.animations[0]);
+            action.play();
+            firecrab.userData.mixer = mixer;
+        }
+    });
+}
+
+// Add new function to handle location navigation
+function navigateToLocation(location) {
+    // Redirect after animation
+    setTimeout(() => {
+        switch (location) {
+            case "Dumbledore's Office":
+                window.location.href = '/locations/dumbledore.html';
+                break;
+            case "Gryffindor Common Room":
+                window.location.href = '/locations/gryffindor.html';
+                break;
+            case "Ollivander's Wand Shop":
+                window.location.href = '/locations/ollivander.html';
+                break;
+            case "Potions Classroom":
+                window.location.href = '/locations/potions.html';
+                break;
+            case "Umbridge's Office":
+                window.location.href = '/locations/umbridge.html';
+                break;
+            case "Transfiguration Class":
+                window.location.href = '/locations/transfiguration.html';
+                break;
+        }
+    }, 1000);
+}
+
+// Add new styles for the location buttons
+const locationStyles = document.createElement('style');
+locationStyles.textContent = `
+    .hogwarts-locations {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1000;
+    }
+
+    .location-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        pointer-events: all;
+    }
+
+    .location-btn {
+        opacity: 0;
+        transform: scale(0.9);
+        animation: buttonAppear 0.5s forwards;
+        margin: 10px;
+        min-width: 200px;
+    }
+
+    @keyframes buttonAppear {
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .location-btn:nth-child(1) { animation-delay: 0.1s; }
+    .location-btn:nth-child(2) { animation-delay: 0.2s; }
+    .location-btn:nth-child(3) { animation-delay: 0.3s; }
+    .location-btn:nth-child(4) { animation-delay: 0.4s; }
+    .location-btn:nth-child(5) { animation-delay: 0.5s; }
+    .location-btn:nth-child(6) { animation-delay: 0.6s; }
+
+    .location-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px #9b6dff;
+        z-index: 2;
+    }
+`;
+
+document.head.appendChild(locationStyles);
 
 // Setup lights
 const lights = setupLights(scene, locations);
