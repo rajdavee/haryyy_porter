@@ -9,7 +9,6 @@ build/
 *.bundle.js
 
 # IDE and editor files
-.vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
